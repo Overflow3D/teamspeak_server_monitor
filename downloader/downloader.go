@@ -17,7 +17,10 @@ type Downloader struct {
 	quit    chan struct{}
 }
 
-const emptyFileSize = 0
+const (
+	emptyFileSize     = 0
+	newFileNameFormat = "new_%s.tar.bz2"
+)
 
 // New creates download struct
 func New(url string) *Downloader {
@@ -52,7 +55,7 @@ func (d *Downloader) updateCheckScheduler() {
 func (d *Downloader) getNewVersion(updateInfo map[string]string) error {
 	version := updateInfo["version"]
 
-	downloadedFileName := fmt.Sprintf("new_%s.tar.bz2", version)
+	downloadedFileName := fmt.Sprintf(newFileNameFormat, version)
 	if d.version.raw == version {
 		return nil
 	}
