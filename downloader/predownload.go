@@ -59,23 +59,3 @@ func formatVersion(version string) string {
 func formatSha(sha string) string {
 	return strings.TrimPrefix(sha, shaPrefix)
 }
-
-// res, err := http.Get("https://www.teamspeak.com/en/downloads#server")
-// if err != nil {
-//   // handle error
-// }
-// defer res.Body.Close()
-//
-// doc, err := goquery.NewDocumentFromReader(res.Body)
-// if err != nil {
-//   log.Fatal(err)
-// }
-// fmt.Println(doc)
-//
-// s := doc.Find("#server .platform.mb-5.linux").First()
-// v := strings.TrimSpace(s.Find(" .version").First().Text())
-// sha := strings.TrimPrefix(s.Find(" .checksum").First().Text(), "SHA256: ")
-// dl, _ := s.Find(" .clipboard").Attr("data-clipboard-text")
-// fmt.Println(dl, " VERSION ", v, sha)
-// // x, exists := doc.Find("#server .platform.mb-5.linux .clipboard").First().Attr("data-clipboard-text")
-// // fmt.Println(x, exists)
