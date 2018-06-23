@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Overflow3D/teamspot_monitor/checker"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -50,6 +51,10 @@ func parseNodesInformation(mainNode *goquery.Selection) (map[string]string, erro
 	updateInfo["sha"] = formatSha(sha)
 
 	return updateInfo, nil
+}
+
+func isShaCorrect(downloadedFile []byte, currentSha string) bool {
+	return checker.CalculateShaAndCompare(downloadedFile, currentSha)
 }
 
 func formatVersion(version string) string {

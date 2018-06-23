@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Overflow3D/teamspeak_watcher/downloader"
+	"github.com/Overflow3D/teamspot_monitor/downloader"
 )
 
 const (
