@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 // Downloader ...
@@ -17,7 +18,10 @@ type Downloader struct {
 	quit    chan struct{}
 }
 
-const emptyFileSize = 0
+const (
+	emptyFileSize     = 0
+	newFileNameFormat = "new_%s.tar.bz2"
+)
 
 // New creates download struct
 func New(url string) *Downloader {
@@ -31,26 +35,31 @@ func New(url string) *Downloader {
 
 // StartUpdater starts ongoing check for new version
 func (d *Downloader) StartUpdater() (chan struct{}, error) {
-	updateInfo, err := d.gatherInformation()
-	if err != nil {
-		return nil, err
-	}
-
 	go d.updateCheckScheduler()
-
-	err = d.getNewVersion(updateInfo)
-	if err != nil {
-		fmt.Println(err)
-	}
 	return d.quit, nil
 }
 
 func (d *Downloader) updateCheckScheduler() {
-	// scheduler goes here
+	ticker := time.NewTicker(5 * time.Second)
+	for {
+		select {
+		case <-ticker.C:
+			// add better logs
+			updateInfo, err := d.gatherInformation()
+			log.Println(err)
+			err = d.fetchRecentServerFiles(updateInfo)
+			log.Println(err)
+		}
+	}
 }
 
-func (d *Downloader) getNewVersion(updateInfo map[string]string) error {
-	downloadedFileName := fmt.Sprintf("new_%s.tar.bz2", updateInfo["version"])
+func (d *Downloader) fetchRecentServerFiles(updateInfo map[string]string) error {
+	version := updateInfo["version"]
+
+	downloadedFileName := fmt.Sprintf(newFileNameFormat, version)
+	if d.version.raw == version {
+		return nil
+	}
 
 	newFile, err := createNewFile(downloadedFileName)
 	if err != nil {
