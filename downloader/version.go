@@ -13,7 +13,11 @@ type version struct {
 	numeric []int
 }
 
-const serverVersionFile = ".server_version"
+const (
+	serverVersionFile   = ".server_version"
+	defaultVersionValue = "0.0.0"
+	filePermission      = 0644
+)
 
 // IsNewVersionAvailable check if recentVersion is the same version as server version
 func (d *Downloader) serverVersion() {
@@ -40,7 +44,7 @@ func (d *Downloader) serverVersion() {
 }
 
 func accessFile() (*os.File, error) {
-	file, err := os.OpenFile(serverVersionFile, os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(serverVersionFile, os.O_RDWR|os.O_CREATE, filePermission)
 	if err != nil {
 		return nil, err
 	}
@@ -57,13 +61,13 @@ func getServerVersion(file *os.File) string {
 }
 
 func makeFileAssignVersion(d *Downloader) {
-	file, err := os.OpenFile(serverVersionFile, os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(serverVersionFile, os.O_RDWR|os.O_CREATE, filePermission)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// add reading version from current teamspeak3 server dir
-	file.Write([]byte("0.0.0"))
+	file.Write([]byte(defaultVersionValue))
 	d.version.numeric = make([]int, 0, 4)
-	d.version.raw = "0.0.0"
+	d.version.raw = defaultVersionValue
 }

@@ -50,7 +50,12 @@ func (d *Downloader) updateCheckScheduler() {
 }
 
 func (d *Downloader) getNewVersion(updateInfo map[string]string) error {
-	downloadedFileName := fmt.Sprintf("new_%s.tar.bz2", updateInfo["version"])
+	version := updateInfo["version"]
+
+	downloadedFileName := fmt.Sprintf("new_%s.tar.bz2", version)
+	if d.version.raw == version {
+		return nil
+	}
 
 	newFile, err := createNewFile(downloadedFileName)
 	if err != nil {
