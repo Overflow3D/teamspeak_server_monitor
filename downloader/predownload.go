@@ -3,6 +3,7 @@ package downloader
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/Overflow3D/teamspot_monitor/checker"
@@ -63,4 +64,14 @@ func formatVersion(version string) string {
 
 func formatSha(sha string) string {
 	return strings.TrimPrefix(sha, shaPrefix)
+}
+
+// make optional arguments and merge it with version create file?
+func createNewFile(name string) (*os.File, error) {
+	newFile, err := os.Create(name)
+	if err != nil {
+		return nil, err
+	}
+
+	return newFile, nil
 }

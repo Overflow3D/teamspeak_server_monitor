@@ -12,14 +12,21 @@ import (
 
 // Downloader ...
 type Downloader struct {
-	url            string
-	currentVersion string
-	quit           chan struct{}
+	url     string
+	version *version
+	quit    chan struct{}
 }
+
+const emptyFileSize = 0
 
 // New creates download struct
 func New(url string) *Downloader {
-	return &Downloader{url: url}
+	downloader := &Downloader{
+		url:     url,
+		version: &version{},
+	}
+	downloader.serverVersion()
+	return downloader
 }
 
 // StartUpdater starts ongoing check for new version
@@ -28,11 +35,18 @@ func (d *Downloader) StartUpdater() (chan struct{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	go d.updateCheckScheduler()
+
 	err = d.getNewVersion(updateInfo)
 	if err != nil {
 		fmt.Println(err)
 	}
 	return d.quit, nil
+}
+
+func (d *Downloader) updateCheckScheduler() {
+	// scheduler goes here
 }
 
 func (d *Downloader) getNewVersion(updateInfo map[string]string) error {
@@ -55,18 +69,15 @@ func (d *Downloader) getNewVersion(updateInfo map[string]string) error {
 		return err
 	}
 
+	defer func() {
+		// create log info here.
+		if unsuccessfulDownload(numBytesWritten) {
+			os.Remove(downloadedFileName)
+		}
+	}()
+
 	log.Printf("Downloaded %d byte file.\n", numBytesWritten)
 	return nil
-
-}
-
-func createNewFile(name string) (*os.File, error) {
-	newFile, err := os.Create(name)
-	if err != nil {
-		return nil, err
-	}
-
-	return newFile, nil
 }
 
 func downloadFile(url string, sha string) (io.ReadCloser, error) {
@@ -86,4 +97,8 @@ func downloadFile(url string, sha string) (io.ReadCloser, error) {
 
 	// since we drained body with sha check we need to regenerate it back
 	return ioutil.NopCloser(bytes.NewBuffer(body)), err
+}
+
+func unsuccessfulDownload(fileSize int64) bool {
+	return fileSize == emptyFileSize
 }
