@@ -3,8 +3,10 @@ package downloader
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
+	"github.com/Overflow3D/teamspot_monitor/checker"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -52,10 +54,24 @@ func parseNodesInformation(mainNode *goquery.Selection) (map[string]string, erro
 	return updateInfo, nil
 }
 
+func isShaCorrect(downloadedFile []byte, currentSha string) bool {
+	return checker.CalculateShaAndCompare(downloadedFile, currentSha)
+}
+
 func formatVersion(version string) string {
 	return strings.TrimSpace(version)
 }
 
 func formatSha(sha string) string {
 	return strings.TrimPrefix(sha, shaPrefix)
+}
+
+// make optional arguments and merge it with version create file?
+func createNewFile(name string) (*os.File, error) {
+	newFile, err := os.Create(name)
+	if err != nil {
+		return nil, err
+	}
+
+	return newFile, nil
 }
